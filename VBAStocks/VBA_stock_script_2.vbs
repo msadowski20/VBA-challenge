@@ -4,6 +4,11 @@ Sub stock_checker()
 'Turn off screen updating while the code runs
 Application.ScreenUpdating = False
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''Create a new sheet with all of the ticker symbols from each sheet to use as a lookup in the for loop
+''remove all duplicate items
+''hide new sheet to keep it from running with in the for loop
+
 'Declare sheet and last row variables
 Dim data2016 As Worksheet, data2015 As Worksheet, data2014 As Worksheet, _
     lastrow2016 As Double, lastrow2015 As Double, lastrow2014 As Double
@@ -18,51 +23,53 @@ Let lastrow2016 = data2016.Range("A1").End(xlDown).Row
 Let lastrow2015 = data2015.Range("A1").End(xlDown).Row
 Let lastrow2014 = data2014.Range("A1").End(xlDown).Row
 
-'Add a new sheet and name it Stock Lookup
-Dim newSheet As Worksheet
-Set newSheet = ThisWorkbook.Sheets.Add(After:=ThisWorkbook.Worksheets(ActiveWorkbook.Worksheets.Count))
+    'Add a new sheet and name it Stock Lookup
+    Dim newSheet As Worksheet
+    Set newSheet = ThisWorkbook.Sheets.Add(After:=ThisWorkbook.Worksheets(ActiveWorkbook.Worksheets.Count))
+    newSheet.Name = "Stock Lookup"
 
-newSheet.Name = "Stock Lookup"
+    'Copy the ticker symbols from the 2016 data sheet and paste them into the Stock Lookup sheet
+    data2016.Range("A2:A" & lastrow2016).Copy
+    newSheet.Range("a1").PasteSpecial xlPasteValues
 
-'Copy the ticker symbols from the 2016 data sheet and paste them into the Stock Lookup sheet
-data2016.Range("A2:A" & lastrow2016).Copy
-newSheet.Range("a1").PasteSpecial xlPasteValues
+    'Declare and set a new last row variable for the new sheet
+    Dim newlastrow As Double
+    Let newlastrow = newSheet.Range("a1").End(xlDown).Row
 
-'Declare and set a new last row variable for the new sheet
-Dim newlastrow As Double
-Let newlastrow = newSheet.Range("a1").End(xlDown).Row
+    'Remove the duplicate entries from the Stock Lookup sheet
+    newSheet.Range("A1:A" & newlastrow).RemoveDuplicates Columns:=1, Header:=xlNo
 
-'Remove the duplicate entries from the Stock Lookup sheet
-newSheet.Range("A1:A" & newlastrow).RemoveDuplicates Columns:=1, Header:=xlNo
+    'Reset the new last row
+    Let newlastrow = newSheet.Range("A1").End(xlDown).Row
 
-'Reset the new last row
-Let newlastrow = newSheet.Range("A1").End(xlDown).Row
+        'Copy the ticker symbols from the 2015 data sheet and paste them into the Stock Lookup sheet
+        data2015.Range("A2:A" & lastrow2015).Copy
+        newSheet.Range("A" & newlastrow + 1).PasteSpecial xlPasteValues
 
-'Copy the ticker symbols from the 2015 data sheet and paste them into the Stock Lookup sheet
-data2015.Range("A2:A" & lastrow2015).Copy
-newSheet.Range("A" & newlastrow + 1).PasteSpecial xlPasteValues
+        'Reset the new last row
+        Let newlastrow = newSheet.Range("A1").End(xlDown).Row
 
-'Reset the new last row
-Let newlastrow = newSheet.Range("A1").End(xlDown).Row
+        'Remove the duplicate entries from the Stock Lookup sheet
+        newSheet.Range("A1:A" & newlastrow).RemoveDuplicates Columns:=1, Header:=xlNo
+        
+        'Reset the new last row
+        Let newlastrow = newSheet.Range("a1").End(xlDown).Row
 
-''Remove the duplicate entries from the Stock Lookup sheet
-newSheet.Range("A1:A" & newlastrow).RemoveDuplicates Columns:=1, Header:=xlNo
-
-'Reset the new last row
-Let newlastrow = newSheet.Range("a1").End(xlDown).Row
-
-'Copy the ticker symbols from the 2014 data sheet and paste them into the Stock Lookup sheet
-data2014.Range("A2:A" & lastrow2014).Copy
-newSheet.Range("A" & newlastrow + 1).PasteSpecial xlPasteValues
-
-'Reset the new last row
-Let newlastrow = newSheet.Range("A1").End(xlDown).Row
-
-'Remove the duplicate entries from the Stock Lookup sheet
-newSheet.Range("A1:A" & newlastrow).RemoveDuplicates Columns:=1, Header:=xlNo
+            'Copy the ticker symbols from the 2014 data sheet and paste them into the Stock Lookup sheet
+            data2014.Range("A2:A" & lastrow2014).Copy
+            newSheet.Range("A" & newlastrow + 1).PasteSpecial xlPasteValues
+            
+            'Reset the new last row
+            Let newlastrow = newSheet.Range("A1").End(xlDown).Row
+            
+            'Remove the duplicate entries from the Stock Lookup sheet
+            newSheet.Range("A1:A" & newlastrow).RemoveDuplicates Columns:=1, Header:=xlNo
 
 'Hide the Stock Lookup sheet
 newSheet.Visible = xlSheetHidden
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''Start the code to run the loop against all of the stock data in each sheet
 
 'Declare global variables for the lookup table
 Dim stockLookup As Worksheet, lastrowLookup As Long, lookupRange As Range
